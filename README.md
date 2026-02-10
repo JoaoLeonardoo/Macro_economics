@@ -33,7 +33,7 @@ Para utilizar os dados na sua aplicação ou no Google Sheets, aponte para o end
 
 | Conteúdo | Endpoint (URL) |
 | :--- | :--- |
-| **JSON Completo** | `https://seu-usuario.github.io/seu-repositorio/data/ipca.json` |
+| **JSON Completo** | `https://joaoleonardoo.github.io/Macro_economics/` |
 
 ---
 
