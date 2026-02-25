@@ -2,9 +2,9 @@ name: Atualizar dados macroeconômicos
 
 on:
   schedule:
-    # Executa todo dia às 03:00 UTC (ajuste conforme necessário)
+    # Executa todo dia às 03:00 UTC
     - cron: '0 3 * * *'
-  workflow_dispatch:  # Permite executar manualmente
+  workflow_dispatch:  # Permite execução manual
 
 jobs:
   atualizar:
@@ -18,18 +18,38 @@ jobs:
         with:
           r-version: '4.3.0'
 
-      - name: Instalar dependências R
+      # Instala dependências de sistema necessárias para pacotes como httr, curl, xml2
+      - name: Instalar dependências do sistema
         run: |
-          Rscript -e "install.packages(c('dplyr', 'jsonlite', 'readxl', 'lubridate'), repos='https://cloud.r-project.org/')"
-          # Se precisar instalar pacotes dos seus scripts auxiliares (Bacen_API, Ipeadata_API), você pode cloná-los ou instalar via remotes
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
 
+      # Instala todos os pacotes R necessários
+      - name: Instalar pacotes R
+        run: |
+          Rscript -e "install.packages(c(
+            'dplyr', 
+            'jsonlite', 
+            'readxl', 
+            'lubridate', 
+            'httr', 
+            'tidyr', 
+            'purrr', 
+            'stringr', 
+            'xml2', 
+            'rvest', 
+            'curl'
+          ), repos='https://cloud.r-project.org/')"
+
+      # Executa o script que gera o JSON
       - name: Executar script de geração do JSON
         run: Rscript gerar_json.R
 
+      # Se houver alterações no arquivo ipca.json, faz commit e push
       - name: Commit e push do novo JSON (se houver alterações)
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add data/ipca.json
-          git diff --quiet && git diff --staged --quiet || git commit -m "Atualização automática dos dados"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Atualização automática dos dados macroeconômicos"
           git push
