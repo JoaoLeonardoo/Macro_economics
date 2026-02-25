@@ -28,8 +28,9 @@
 # ======================================= #
 # === 1. Source Scripts and Libraries === #
 # ======================================= #
-source('https://raw.githubusercontent.com/paulo-icaro/Bacen_API/main/Bacen_Query.R')
-source('https://raw.githubusercontent.com/paulo-icaro/Ipeadata_API/refs/heads/main/Ipeadata_Query.R')
+# AGORA CARREGANDO LOCALMENTE
+source("Bacen_Query.R")
+source("Ipeadata_Query.R")
 
 library(dplyr)
 
