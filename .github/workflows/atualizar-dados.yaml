@@ -1,0 +1,35 @@
+name: Atualizar dados macroeconômicos
+
+on:
+  schedule:
+    # Executa todo dia às 03:00 UTC (ajuste conforme necessário)
+    - cron: '0 3 * * *'
+  workflow_dispatch:  # Permite executar manualmente
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: Configurar R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3.0'
+
+      - name: Instalar dependências R
+        run: |
+          Rscript -e "install.packages(c('dplyr', 'jsonlite', 'readxl', 'lubridate'), repos='https://cloud.r-project.org/')"
+          # Se precisar instalar pacotes dos seus scripts auxiliares (Bacen_API, Ipeadata_API), você pode cloná-los ou instalar via remotes
+
+      - name: Executar script de geração do JSON
+        run: Rscript gerar_json.R
+
+      - name: Commit e push do novo JSON (se houver alterações)
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/ipca.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Atualização automática dos dados"
+          git push
