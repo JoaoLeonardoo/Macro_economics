@@ -39,6 +39,7 @@ jobs:
             'xml2', 
             'rvest', 
             'curl'
+            'httr2'
           ), repos='https://cloud.r-project.org/')"
 
       # Executa o script que gera o JSON
