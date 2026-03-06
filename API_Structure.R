@@ -15,8 +15,7 @@ library(lubridate)
 # ================================ #
 # === 2. Macroeconomic Dataset === #
 # ================================ #
-source('https://raw.githubusercontent.com/paulo-icaro/Macroeconomic_Variables/refs/heads/master/API_Dataset.R')
-
+source("API_Dataset.R") 
 # ============== #
 # === 3. API === #
 # ============== #
