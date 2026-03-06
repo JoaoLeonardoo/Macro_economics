@@ -2,16 +2,20 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>API Macroeconômica Estática</title>
+    <title>Dados Macroeconômicos</title>
     <style>
-        body { font-family: monospace; background: #121212; color: #00ff00; padding: 20px; }
-        pre { white-space: pre-wrap; word-wrap: break-word; background: #1e1e1e; padding: 15px; border-radius: 5px; }
+        body { font-family: Arial, sans-serif; background: #121212; color: #00ff00; padding: 20px; }
         #atualizacao { color: #888; font-size: 0.9em; margin-bottom: 10px; }
+        table { border-collapse: collapse; width: 100%; background: #1e1e1e; color: #00ff00; }
+        th, td { border: 1px solid #00ff00; padding: 8px; text-align: left; }
+        th { background-color: #2a2a2a; }
+        tr:hover { background-color: #2a2a2a; }
     </style>
 </head>
 <body>
+    <h1>Séries Macroeconômicas Mensais</h1>
     <div id="atualizacao">Carregando data de atualização...</div>
-    <pre id="output">Carregando dados...</pre>
+    <div id="output">Carregando dados...</div>
     <script src="script.js"></script>
 </body>
 </html>
