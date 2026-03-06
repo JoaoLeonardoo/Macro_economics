@@ -22,9 +22,12 @@ ipca_data <- monthly_macro_series %>%
   select(data, ipca) %>%
   mutate(data = as.character(data))
 
+# Data e hora no horário de Brasília (UTC-3)
+ultima_atualizacao <- format(Sys.time(), tz = "America/Sao_Paulo", "%Y-%m-%d %H:%M:%S")
+
 # Cria uma lista com os dados e a data/hora da última atualização
 output <- list(
-  ultima_atualizacao = format(Sys.time(), "%Y-%m-%d %H:%M:%S UTC"),
+  ultima_atualizacao = ultima_atualizacao,
   dados = ipca_data
 )
 
