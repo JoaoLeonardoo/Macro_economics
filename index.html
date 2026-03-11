@@ -3,19 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <title>Dados Macroeconômicos</title>
+    <!-- SheetJS para exportar Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #121212; color: #00ff00; padding: 20px; }
+        body { font-family: Arial, sans-serif; background: #121212; color: #00ff00; padding: 20px; margin: 0; }
+        h1 { color: #fff; }
         #atualizacao { color: #888; font-size: 0.9em; margin-bottom: 10px; }
-        table { border-collapse: collapse; width: 100%; background: #1e1e1e; color: #00ff00; }
-        th, td { border: 1px solid #00ff00; padding: 8px; text-align: left; }
-        th { background-color: #2a2a2a; }
-        tr:hover { background-color: #2a2a2a; }
+        .filtros {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        .filtros div {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+        }
+        .filtros label {
+            font-size: 0.8em;
+            color: #aaa;
+            margin-bottom: 3px;
+        }
+        .filtros select, .filtros input {
+            background: #2a2a2a;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 8px;
+            border-radius: 3px;
+            font-family: inherit;
+        }
+        .filtros select[multiple] {
+            height: 120px;
+        }
+        .filtros button {
+            background: #0f0;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .filtros button:hover {
+            background: #0c0;
+        }
+        .exportar {
+            background: #1e1e1e;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .exportar button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .exportar button:hover {
+            background: #005f9e;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: #1e1e1e;
+            color: #0f0;
+            font-size: 0.9em;
+        }
+        th, td {
+            border: 1px solid #0f0;
+            padding: 6px;
+            text-align: left;
+        }
+        th {
+            background-color: #2a2a2a;
+            position: sticky;
+            top: 0;
+        }
+        tr:hover {
+            background-color: #2a2a2a;
+        }
+        .container-tabela {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #0f0;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <h1>Séries Macroeconômicas Mensais</h1>
     <div id="atualizacao">Carregando data de atualização...</div>
-    <div id="output">Carregando dados...</div>
+
+    <!-- Área de filtros -->
+    <div class="filtros">
+        <div>
+            <label>Séries (Ctrl+clique para múltiplas):</label>
+            <select id="seriesSelect" multiple size="6"></select>
+        </div>
+        <div>
+            <label>Data inicial:</label>
+            <input type="date" id="startDate">
+        </div>
+        <div>
+            <label>Data final:</label>
+            <input type="date" id="endDate">
+        </div>
+        <button id="aplicarFiltro">Aplicar filtro</button>
+    </div>
+
+    <!-- Área de exportação -->
+    <div class="exportar">
+        <span>Exportar dados filtrados:</span>
+        <button id="exportarExcel">📥 Excel (XLSX)</button>
+    </div>
+
+    <!-- Tabela de resultados -->
+    <div class="container-tabela">
+        <table id="tabelaDados">
+            <thead id="tabelaHead"></thead>
+            <tbody id="tabelaBody"></tbody>
+        </table>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
