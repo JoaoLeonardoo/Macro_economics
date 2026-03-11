@@ -17,8 +17,8 @@ async function buscarDados() {
         // Identifica as colunas disponíveis (todas menos 'data')
         todasColunas = Object.keys(dadosCompletos[0]).filter(col => col !== 'data');
         
-        // Preenche o select de séries
-        preencherSelectSeries();
+        // Preenche os checkboxes de séries
+        preencherCheckboxesSeries();
         
         // Define as datas mínima e máxima para os inputs
         definirLimitesData();
@@ -33,24 +33,20 @@ async function buscarDados() {
     }
 }
 
-function preencherSelectSeries() {
-    const select = document.getElementById('seriesSelect');
-    select.innerHTML = ''; // Limpa
-    
-    // Adiciona uma opção para selecionar todas (opcional)
-    // Mas vamos deixar o usuário escolher manualmente
+function preencherCheckboxesSeries() {
+    const container = document.getElementById('seriesCheckboxes');
+    container.innerHTML = ''; // Limpa
     
     todasColunas.forEach(col => {
-        const option = document.createElement('option');
-        option.value = col;
-        option.textContent = col;
-        select.appendChild(option);
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = col;
+        checkbox.checked = true; // Por padrão, todas selecionadas
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(col));
+        container.appendChild(label);
     });
-    
-    // Seleciona todas por padrão (opcional)
-    // for (let i = 0; i < select.options.length; i++) {
-    //     select.options[i].selected = true;
-    // }
 }
 
 function definirLimitesData() {
@@ -72,16 +68,19 @@ function definirLimitesData() {
 function aplicarFiltro() {
     if (!dadosCompletos) return;
     
-    // Obter séries selecionadas
-    const select = document.getElementById('seriesSelect');
-    const selectedOptions = Array.from(select.selectedOptions).map(opt => opt.value);
+    // Obter séries selecionadas (checkboxes marcados)
+    const checkboxes = document.querySelectorAll('#seriesCheckboxes input[type="checkbox"]');
+    const selectedOptions = [];
+    checkboxes.forEach(cb => {
+        if (cb.checked) selectedOptions.push(cb.value);
+    });
     
-    // Se nenhuma selecionada, usa todas
+    // Se nenhuma selecionada, usa todas (mas isso não deve acontecer se todas estiverem marcadas por padrão)
     const colunasMostrar = selectedOptions.length > 0 ? selectedOptions : todasColunas;
     
     // Obter datas
-    const start = document.getElementById('startDate').value;
-    const end = document.getElementById('endDate').value;
+    let start = document.getElementById('startDate').value;
+    let end = document.getElementById('endDate').value;
     
     // Filtrar linhas por período
     let dadosFiltrados = dadosCompletos;
@@ -156,15 +155,36 @@ function exportarExcel() {
     // Criar planilha
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(dadosExport);
+    
+    // Ajustar largura das colunas para 11 (em unidades de caracteres)
+    const colWidths = [];
+    for (let i = 0; i < colunas.length; i++) {
+        colWidths.push({ wch: 11 }); // wch = largura em número de caracteres
+    }
+    ws['!cols'] = colWidths;
+    
+    // Adicionar a planilha ao workbook
     XLSX.utils.book_append_sheet(wb, ws, "Dados");
     
     // Gerar arquivo e baixar
     XLSX.writeFile(wb, "dados_macro.xlsx");
 }
 
+// Função para limpar filtros de data e mostrar todo o período
+function todasDatas() {
+    if (!dadosCompletos) return;
+    const datas = dadosCompletos.map(item => item.data).sort();
+    const primeira = datas[0];
+    const ultima = datas[datas.length - 1];
+    document.getElementById('startDate').value = primeira;
+    document.getElementById('endDate').value = ultima;
+    aplicarFiltro(); // Reaplica o filtro com as datas completas
+}
+
 // Eventos
 document.getElementById('aplicarFiltro').addEventListener('click', aplicarFiltro);
 document.getElementById('exportarExcel').addEventListener('click', exportarExcel);
+document.getElementById('todasDatas').addEventListener('click', todasDatas);
 
 // Iniciar
 buscarDados();
