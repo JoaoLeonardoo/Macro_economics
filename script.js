@@ -11,11 +11,11 @@
 // Aguarda o carregamento completo do DOM para evitar erros de elementos não encontrados
 document.addEventListener('DOMContentLoaded', function() {
 
-    // ========== VARIÁVEIS GLOBAIS ==========
+    //globaix
     let dadosCompletos = null;          // Armazena todos os dados carregados do JSON
     let todasColunas = [];               // Nomes de todas as séries disponíveis (exceto 'data')
 
-    // ========== ELEMENTOS DO DOM ==========
+    // DOM
     const atualizacaoEl = document.getElementById('atualizacao');
     const seriesCheckboxesDiv = document.getElementById('seriesCheckboxes');
     const startDateInput = document.getElementById('startDate');
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabelaHead = document.getElementById('tabelaHead');
     const tabelaBody = document.getElementById('tabelaBody');
 
-    // ========== FUNÇÕES ==========
+    // criando as funções do sistema, lembrar de usar poo depois
 
     /**
      * Busca o arquivo JSON e inicializa a interface.
