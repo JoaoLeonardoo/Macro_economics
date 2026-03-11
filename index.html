@@ -37,8 +37,27 @@
             border-radius: 3px;
             font-family: inherit;
         }
-        .filtros select[multiple] {
-            height: 120px;
+        /* Estilo para o container de checkboxes */
+        .checkbox-container {
+            display: flex;
+            flex-direction: column;
+            max-height: 150px;
+            overflow-y: auto;
+            background: #2a2a2a;
+            border: 1px solid #0f0;
+            border-radius: 3px;
+            padding: 5px;
+        }
+        .checkbox-container label {
+            display: flex;
+            align-items: center;
+            color: #0f0;
+            font-size: 0.9em;
+            margin: 2px 0;
+        }
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 5px;
+            accent-color: #0f0;
         }
         .filtros button {
             background: #0f0;
@@ -61,6 +80,7 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            flex-wrap: wrap;
         }
         .exportar button {
             background: #007acc;
@@ -86,12 +106,16 @@
             text-align: left;
         }
         th {
-            background-color: #2a2a2a;
+            background-color: #556b2f; /* verde-oliva ênfase 3 */
+            color: #fff;
             position: sticky;
             top: 0;
         }
-        tr:hover {
-            background-color: #2a2a2a;
+        td {
+            background-color: #6b8e4c; /* verde-oliva ênfase 3 60% mais claro (aproximado) */
+        }
+        tr:hover td {
+            background-color: #7ca65a; /* um pouco mais claro ao passar o mouse */
         }
         .container-tabela {
             max-height: 500px;
@@ -108,8 +132,8 @@
     <!-- Área de filtros -->
     <div class="filtros">
         <div>
-            <label>Séries (Ctrl+clique para múltiplas):</label>
-            <select id="seriesSelect" multiple size="6"></select>
+            <label>Séries:</label>
+            <div id="seriesCheckboxes" class="checkbox-container"></div>
         </div>
         <div>
             <label>Data inicial:</label>
@@ -119,7 +143,10 @@
             <label>Data final:</label>
             <input type="date" id="endDate">
         </div>
-        <button id="aplicarFiltro">Aplicar filtro</button>
+        <div style="flex-direction: row; align-items: center; gap: 10px;">
+            <button id="aplicarFiltro">Aplicar filtro</button>
+            <button id="todasDatas">Todas as datas</button>
+        </div>
     </div>
 
     <!-- Área de exportação -->
