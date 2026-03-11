@@ -1,3 +1,7 @@
+// Variável global para armazenar os dados completos
+let dadosCompletos = null;
+let todasColunas = [];
+
 async function buscarDados() {
     try {
         const resposta = await fetch('./data/dados_macro.json');
@@ -7,33 +11,160 @@ async function buscarDados() {
         document.getElementById('atualizacao').textContent = 
             `Última atualização: ${objeto.ultima_atualizacao}`;
         
-        // Monta a tabela com os dados
-        const dados = objeto.dados;
-        let tabelaHtml = '<table border="1" style="border-collapse: collapse; width:100%;">';
+        // Armazena os dados completos
+        dadosCompletos = objeto.dados;
         
-        // Cabeçalho
-        tabelaHtml += '<thead><tr>';
-        for (let coluna in dados[0]) {
-            tabelaHtml += `<th>${coluna}</th>`;
-        }
-        tabelaHtml += '</tr></thead><tbody>';
+        // Identifica as colunas disponíveis (todas menos 'data')
+        todasColunas = Object.keys(dadosCompletos[0]).filter(col => col !== 'data');
         
-        // Linhas de dados
-        dados.forEach(linha => {
-            tabelaHtml += '<tr>';
-            for (let coluna in linha) {
-                tabelaHtml += `<td>${linha[coluna]}</td>`;
-            }
-            tabelaHtml += '</tr>';
-        });
+        // Preenche o select de séries
+        preencherSelectSeries();
         
-        tabelaHtml += '</tbody></table>';
-        document.getElementById('output').innerHTML = tabelaHtml;
+        // Define as datas mínima e máxima para os inputs
+        definirLimitesData();
+        
+        // Exibe a tabela inicial (todas as séries, período completo)
+        aplicarFiltro();
         
     } catch (erro) {
-        document.getElementById('output').innerHTML = "Erro ao carregar JSON: " + erro;
+        document.getElementById('tabelaBody').innerHTML = 
+            `<tr><td colspan="10">Erro ao carregar JSON: ${erro}</td></tr>`;
         document.getElementById('atualizacao').textContent = "Erro ao carregar data de atualização.";
     }
 }
 
+function preencherSelectSeries() {
+    const select = document.getElementById('seriesSelect');
+    select.innerHTML = ''; // Limpa
+    
+    // Adiciona uma opção para selecionar todas (opcional)
+    // Mas vamos deixar o usuário escolher manualmente
+    
+    todasColunas.forEach(col => {
+        const option = document.createElement('option');
+        option.value = col;
+        option.textContent = col;
+        select.appendChild(option);
+    });
+    
+    // Seleciona todas por padrão (opcional)
+    // for (let i = 0; i < select.options.length; i++) {
+    //     select.options[i].selected = true;
+    // }
+}
+
+function definirLimitesData() {
+    if (!dadosCompletos || dadosCompletos.length === 0) return;
+    
+    // Ordena por data para obter a primeira e última
+    const datas = dadosCompletos.map(item => item.data).sort();
+    const primeira = datas[0];
+    const ultima = datas[datas.length - 1];
+    
+    document.getElementById('startDate').value = primeira;
+    document.getElementById('endDate').value = ultima;
+    document.getElementById('startDate').min = primeira;
+    document.getElementById('startDate').max = ultima;
+    document.getElementById('endDate').min = primeira;
+    document.getElementById('endDate').max = ultima;
+}
+
+function aplicarFiltro() {
+    if (!dadosCompletos) return;
+    
+    // Obter séries selecionadas
+    const select = document.getElementById('seriesSelect');
+    const selectedOptions = Array.from(select.selectedOptions).map(opt => opt.value);
+    
+    // Se nenhuma selecionada, usa todas
+    const colunasMostrar = selectedOptions.length > 0 ? selectedOptions : todasColunas;
+    
+    // Obter datas
+    const start = document.getElementById('startDate').value;
+    const end = document.getElementById('endDate').value;
+    
+    // Filtrar linhas por período
+    let dadosFiltrados = dadosCompletos;
+    if (start) {
+        dadosFiltrados = dadosFiltrados.filter(item => item.data >= start);
+    }
+    if (end) {
+        dadosFiltrados = dadosFiltrados.filter(item => item.data <= end);
+    }
+    
+    // Criar tabela com as colunas selecionadas
+    exibirTabela(dadosFiltrados, ['data', ...colunasMostrar]);
+}
+
+function exibirTabela(dados, colunas) {
+    const thead = document.getElementById('tabelaHead');
+    const tbody = document.getElementById('tabelaBody');
+    
+    // Cabeçalho
+    let headerHtml = '<tr>';
+    colunas.forEach(col => {
+        headerHtml += `<th>${col}</th>`;
+    });
+    headerHtml += '</tr>';
+    thead.innerHTML = headerHtml;
+    
+    // Corpo
+    let bodyHtml = '';
+    dados.forEach(item => {
+        bodyHtml += '<tr>';
+        colunas.forEach(col => {
+            bodyHtml += `<td>${item[col] !== undefined ? item[col] : ''}</td>`;
+        });
+        bodyHtml += '</tr>';
+    });
+    
+    if (dados.length === 0) {
+        bodyHtml = '<tr><td colspan="' + colunas.length + '">Nenhum dado encontrado no período</td></tr>';
+    }
+    
+    tbody.innerHTML = bodyHtml;
+}
+
+function exportarExcel() {
+    if (!dadosCompletos) return;
+    
+    // Obter as colunas atualmente exibidas na tabela (do cabeçalho)
+    const thead = document.getElementById('tabelaHead');
+    if (!thead.rows.length) return;
+    const colunas = Array.from(thead.rows[0].cells).map(cell => cell.textContent);
+    
+    // Obter dados da tabela (tbody)
+    const tbody = document.getElementById('tabelaBody');
+    const linhas = tbody.rows;
+    
+    // Construir matriz de dados para o SheetJS
+    const dadosExport = [];
+    
+    // Cabeçalho
+    dadosExport.push(colunas);
+    
+    // Linhas
+    for (let i = 0; i < linhas.length; i++) {
+        const linha = [];
+        const celulas = linhas[i].cells;
+        for (let j = 0; j < celulas.length; j++) {
+            linha.push(celulas[j].textContent);
+        }
+        dadosExport.push(linha);
+    }
+    
+    // Criar planilha
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(dadosExport);
+    XLSX.utils.book_append_sheet(wb, ws, "Dados");
+    
+    // Gerar arquivo e baixar
+    XLSX.writeFile(wb, "dados_macro.xlsx");
+}
+
+// Eventos
+document.getElementById('aplicarFiltro').addEventListener('click', aplicarFiltro);
+document.getElementById('exportarExcel').addEventListener('click', exportarExcel);
+
+// Iniciar
 buscarDados();
