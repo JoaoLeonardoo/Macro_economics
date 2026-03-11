@@ -2,13 +2,34 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <!-- Título da página que aparece na aba do navegador -->
     <title>Dados Macroeconômicos</title>
-    <!-- SheetJS para exportar Excel -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <!-- Biblioteca ExcelJS para gerar planilhas com formatação (usada na exportação) -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #121212; color: #00ff00; padding: 20px; margin: 0; }
-        h1 { color: #fff; }
-        #atualizacao { color: #888; font-size: 0.9em; margin-bottom: 10px; }
+        /* estilizando*/
+        /* Definimos uma paleta escura com texto verde para combinar com o tema "terminal" */
+        body {
+            font-family: Arial, sans-serif;
+            background: #121212;      /* Fundo escuro */
+            color: #00ff00;            /* Texto verde brilhante */
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 {
+            color: #fff;               /* Título em branco para destaque */
+        }
+
+        /* Área que mostra a data da última atualização dos dados */
+        #atualizacao {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        /* area dos filtros */
+        /* Agrupa os controles de filtro em um painel organizado */
         .filtros {
             background: #1e1e1e;
             padding: 15px;
@@ -16,20 +37,44 @@
             margin-bottom: 20px;
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
             align-items: flex-end;
         }
-        .filtros div {
+
+        /* Cada grupo de controle (ex: checkboxes, datas) */
+        .filtros .grupo {
             display: flex;
             flex-direction: column;
-            min-width: 150px;
+            min-width: 180px;
         }
+
         .filtros label {
             font-size: 0.8em;
             color: #aaa;
             margin-bottom: 3px;
         }
-        .filtros select, .filtros input {
+
+        /* Área dos checkboxes de séries - usamos flex-wrap para quebra automática */
+        .filtros .series-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 3px;
+            max-width: 500px;
+        }
+
+        .filtros .series-checkboxes label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #0f0;
+            font-size: 0.9em;
+        }
+
+        /* Campos de data */
+        .filtros input[type="date"] {
             background: #2a2a2a;
             color: #0f0;
             border: 1px solid #0f0;
@@ -37,28 +82,8 @@
             border-radius: 3px;
             font-family: inherit;
         }
-        /* Estilo para o container de checkboxes */
-        .checkbox-container {
-            display: flex;
-            flex-direction: column;
-            max-height: 150px;
-            overflow-y: auto;
-            background: #2a2a2a;
-            border: 1px solid #0f0;
-            border-radius: 3px;
-            padding: 5px;
-        }
-        .checkbox-container label {
-            display: flex;
-            align-items: center;
-            color: #0f0;
-            font-size: 0.9em;
-            margin: 2px 0;
-        }
-        .checkbox-container input[type="checkbox"] {
-            margin-right: 5px;
-            accent-color: #0f0;
-        }
+
+        /* Botões principais (verde) */
         .filtros button {
             background: #0f0;
             color: #000;
@@ -69,9 +94,22 @@
             cursor: pointer;
             transition: 0.3s;
         }
+
         .filtros button:hover {
             background: #0c0;
         }
+
+        /* Botão secundário (cinza) usado para "Todas as datas" tentando pensar no usuário */
+        .filtros button.secundario {
+            background: #555;
+            color: #fff;
+        }
+
+        .filtros button.secundario:hover {
+            background: #666;
+        }
+
+        /* exportação excel */
         .exportar {
             background: #1e1e1e;
             padding: 10px 15px;
@@ -80,19 +118,30 @@
             display: flex;
             gap: 10px;
             align-items: center;
-            flex-wrap: wrap;
         }
+
         .exportar button {
-            background: #007acc;
+            background: #007acc;       /* Azul para diferenciar das ações de filtro */
             color: white;
             border: none;
             padding: 8px 16px;
             border-radius: 3px;
             cursor: pointer;
         }
+
         .exportar button:hover {
             background: #005f9e;
         }
+
+        /* tabela*/
+        /* A tabela terá um contêiner com rolagem para não ocupar a tela toda */
+        .container-tabela {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 2px solid #0f0;    /* Borda verde para combinar */
+            border-radius: 5px;
+        }
+
         table {
             border-collapse: collapse;
             width: 100%;
@@ -100,69 +149,84 @@
             color: #0f0;
             font-size: 0.9em;
         }
-        th, td {
-            border: 1px solid #0f0;
-            padding: 6px;
-            text-align: left;
-        }
+
+        /* Cabeçalho fixo durante a rolagem */
         th {
-            background-color: #556b2f; /* verde-oliva ênfase 3 */
-            color: #fff;
+            background-color: #2a2a2a;
+            padding: 8px;
+            border: 1px solid #0f0;
             position: sticky;
             top: 0;
+            z-index: 10;               /*tentando garantir que fique sobre as linhas */
         }
+
         td {
-            background-color: #6b8e4c; /* verde-oliva ênfase 3 60% mais claro (aproximado) */
-        }
-        tr:hover td {
-            background-color: #7ca65a; /* um pouco mais claro ao passar o mouse */
-        }
-        .container-tabela {
-            max-height: 500px;
-            overflow-y: auto;
+            padding: 6px;
             border: 1px solid #0f0;
-            border-radius: 5px;
+        }
+
+        /* Efeito de hover nas linhas para facilitar leitura */
+        tr:hover td {
+            background-color: #2a2a2a;
         }
     </style>
 </head>
 <body>
+    <!-- Cabeçalho principal -->
     <h1>Séries Macroeconômicas Mensais</h1>
+    
+    <!-- Elemento que será preenchido via JavaScript com a data da última atualização do JSON -->
     <div id="atualizacao">Carregando data de atualização...</div>
 
-    <!-- Área de filtros -->
+    <!-- filtros -->
     <div class="filtros">
-        <div>
-            <label>Séries:</label>
-            <div id="seriesCheckboxes" class="checkbox-container"></div>
+        <!-- Grupo de checkboxes para selecionar as séries desejadas -->
+        <div class="grupo">
+            <label>Séries (marque as desejadas):</label>
+            <div id="seriesCheckboxes" class="series-checkboxes">
+                <!-- Os checkboxes serão gerados dinamicamente pelo JavaScript -->
+            </div>
         </div>
-        <div>
+
+        <!-- Grupo para selecionar a data inicial -->
+        <div class="grupo">
             <label>Data inicial:</label>
             <input type="date" id="startDate">
         </div>
-        <div>
+
+        <!-- Grupo para selecionar a data final -->
+        <div class="grupo">
             <label>Data final:</label>
             <input type="date" id="endDate">
         </div>
-        <div style="flex-direction: row; align-items: center; gap: 10px;">
+
+        <!-- Botões de ação -->
+        <div class="grupo" style="flex-direction: row; gap: 10px;">
+            <!-- Botão verde: aplica os filtros selecionados -->
             <button id="aplicarFiltro">Aplicar filtro</button>
-            <button id="todasDatas">Todas as datas</button>
+            <!-- Botão cinza: restaura o período completo (todas as datas disponíveis) -->
+            <button id="todasDatas" class="secundario">Todas as datas</button>
         </div>
     </div>
 
-    <!-- Área de exportação -->
+    <!-- painel de exportação -->
     <div class="exportar">
         <span>Exportar dados filtrados:</span>
+        <!-- Botão azul que aciona a exportação para Excel com formatação especial -->
         <button id="exportarExcel">📥 Excel (XLSX)</button>
     </div>
 
-    <!-- Tabela de resultados -->
+    <!-- resultado?-->
     <div class="container-tabela">
         <table id="tabelaDados">
+            <!-- Cabeçalho da tabela (nomes das colunas) será preenchido via JS -->
             <thead id="tabelaHead"></thead>
+            <!-- Corpo da tabela (linhas de dados) será preenchido via JS -->
             <tbody id="tabelaBody"></tbody>
         </table>
     </div>
 
+    <!-- Inclusão do arquivo JavaScript externo que contém toda a lógica da aplicação -->
     <script src="script.js"></script>
 </body>
 </html>
