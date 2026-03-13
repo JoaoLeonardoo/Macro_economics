@@ -48,5 +48,5 @@ Para utilizar os dados na sua aplicação ou no Google Sheets, aponte para o end
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%">
-  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueGZ3bmZqZzRveXp3eHozbmR0bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l41lTfuxN7u88N7dm/giphy.gif" width="150px">
+  <img src="https://antlia.com.br/wp-content/uploads/2024/04/ITE1.jpg" width="150px">
 </p>
