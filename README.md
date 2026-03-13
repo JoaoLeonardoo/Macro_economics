@@ -29,7 +29,7 @@ Esta é uma **API Estática** de alta performance para consulta de variáveis ma
 
 ---
 
-## 📡 Como consumir os dados
+##  Como consumir os dados
 
 Para utilizar os dados na sua aplicação ou no Google Sheets, aponte para o endpoint abaixo:
 
