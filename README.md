@@ -1,23 +1,25 @@
-# 📊 Macroeconomic Data API 🚀
+# 📊 Macroeconomic Data API 
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%">
   <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueGZ3bmZqZzRveXp3eHozbmR0bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKSjPInLAsGv39S/giphy.gif" width="300px">
 </p>
 
-## 📌 O que é este projeto?
+## O que é este projeto?
 Esta é uma **API Estática** de alta performance para consulta de variáveis macroeconômicas brasileiras. O projeto transforma dados brutos de economia em um endpoint JSON acessível via web, facilitando a automação de planilhas e dashboards.
 
 
 
-### ⚙️ Funcionalidades
-* ⚡ **Leitura Instantânea:** Servido via GitHub Pages (sem delay de inicialização).
-* 📊 **Dados Consolidados:** IPCA, SELIC, PIB e Taxa de Câmbio em um só lugar.
-* 🔄 **Integração Pronta:** Feito sob medida para ser consumido pelo **Google Apps Script**.
+### Funcionalidades
+*  **Leitura Instantânea:** Servido via GitHub Pages (sem delay de inicialização).
+*  **Dados Consolidados:** IPCA, SELIC, PIB e Taxa de Câmbio em um só lugar.**
+*  **Integração Pronta:** Feito sob medida para ser consumido pelo **Google Apps Script**.
+*  **Converão para arquivo xlsx**
+*  **Filtro de macros e datas**
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 <div align="left">
   <img src="https://img.shields.io/badge/json-5E5E5E?style=for-the-badge&logo=json&logoColor=white" />
   <img src="https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E" />
@@ -27,7 +29,7 @@ Esta é uma **API Estática** de alta performance para consulta de variáveis ma
 
 ---
 
-## 📡 Como consumir os dados
+##  Como consumir os dados
 
 Para utilizar os dados na sua aplicação ou no Google Sheets, aponte para o endpoint abaixo:
 
@@ -37,10 +39,12 @@ Para utilizar os dados na sua aplicação ou no Google Sheets, aponte para o end
 
 ---
 
-## 🚀 Como funciona por trás
-1.  Os dados econômicos são armazenados em `data/ipca.json`.
+## Como funciona por trás
+1.  Os dados econômicos são armazenados em `data/dados_macro.json`.
 2.  O `script.js` carrega esses dados e os apresenta no `index.html`.
-3.  O **GitHub Pages** hospeda tudo de forma gratuita e estável.
+3.  Os dados tem o fluxo automático de atualização gerados apartir da api e da conversão pra "dados_macros.ipca"
+4.  Todo dia, cerca de 1am a partir de uma função do action o sistema atualiza os dados do site
+5.  O **GitHub Pages** hospeda tudo de forma gratuita e estável.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%">
