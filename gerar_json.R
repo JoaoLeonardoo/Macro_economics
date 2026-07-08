@@ -1,35 +1,29 @@
-# ============================== #
-# === Gerar JSON para o site === #
-# ============================== #
-
-source("API_Dataset.R")
+source("API_Dataset.R")  # ou o caminho correto
 library(jsonlite)
 
-if (!dir.exists("data")) {
-  dir.create("data")
-}
+if (!dir.exists("data")) dir.create("data")
 
-if (!exists("monthly_macro_series")) {
-  stop("Erro: monthly_macro_series não foi criado. Verifique API_Dataset.R")
-}
+# O novo dataset se chama 'final_dataset'
+if (!exists("final_dataset")) stop("final_dataset não encontrado")
 
-# Pega todas as colunas disponíveis (data + todas as séries mensais)
-dados_completos <- monthly_macro_series %>%
-  mutate(data = as.character(data))  # converte Date para string
+# Converte a data para formato ISO (YYYY-MM-DD)
+# O formato atual é "Ano_QTrimestre" (ex: "2010_Q1")
+# Vamos transformar para o primeiro dia do trimestre
+dados_export <- final_dataset %>%
+  mutate(
+    data = as.Date(paste0(substr(data, 1, 4), "-", 
+                          as.numeric(substr(data, 7, 7))*3 - 2, "-01"))
+  ) %>%
+  select(-Ano, -Trimestre)  # remove colunas auxiliares se existirem
 
-# Data/hora de Brasília
+# Adiciona timestamp de Brasília
 ultima_atualizacao <- format(Sys.time(), tz = "America/Sao_Paulo", "%Y-%m-%d %H:%M:%S")
 
-# Estrutura final com metadados
+# Estrutura final
 output <- list(
   ultima_atualizacao = ultima_atualizacao,
-  dados = dados_completos
+  dados = dados_export
 )
 
-# Salva o JSON
-write_json(output, 
-           path = "data/dados_macro.json", 
-           pretty = TRUE, 
-           auto_unbox = TRUE)
-
-message("Arquivo JSON gerado com sucesso em data/dados_macro.json")
+write_json(output, path = "data/dados_macro.json", pretty = TRUE, auto_unbox = TRUE)
+message("JSON gerado com sucesso!")
