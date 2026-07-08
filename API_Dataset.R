@@ -32,12 +32,10 @@
 # ======================================= #
 # === 1. Source Scripts and Libraries === #
 # ======================================= #
-source('https://raw.githubusercontent.com/paulo-icaro/Bacen_API/main/Bacen_Query.R')
-source('https://raw.githubusercontent.com/paulo-icaro/Ipeadata_API/refs/heads/main/Ipeadata_Query.R')
-source('https://raw.githubusercontent.com/paulo-icaro/Sidra_API/refs/heads/main/Sidra_Query.R')
-source('https://raw.githubusercontent.com/paulo-icaro/Variables_Frequency_Transforming/refs/heads/main/Variables_Frequency_Transforming.R')
-library(dplyr)
-
+source("Bacen_Query.R")
+source("Ipeadata_Query.R")
+source("Sidra_Query.R")
+source("Variables_Frequency_Transforming.R")
 
 
 
