@@ -28,7 +28,7 @@ jobs:
             'dplyr', 'jsonlite', 'readxl', 'lubridate', 'httr', 'httr2', 'tidyr', 
             'purrr', 'stringr', 'xml2', 'rvest', 'curl', 'magrittr', 'tibble', 
             'readr', 'forcats', 'glue', 'openssl', 'RCurl', 'plyr', 'reshape2', 
-            'rlang', 'cli', 'crayon', 'withr', 'testthat'
+            'rlang', 'cli', 'crayon', 'withr', 'testthat', 'seasonal', 'tidyverse', 'GetBCBData', 'ipeadatar' 
           ), repos='https://cloud.r-project.org/')"
 
       - name: Listar arquivos e sessão R (debug)
