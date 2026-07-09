@@ -2,8 +2,8 @@ name: Atualizar dados macroeconômicos
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # Executa todo dia às 03:00 UTC ou 1:28 horário de brasília
-  workflow_dispatch:       # Permite execução manual
+    - cron: '0 3 * * *'
+  workflow_dispatch:
 
 jobs:
   atualizar:
@@ -25,18 +25,12 @@ jobs:
       - name: Instalar pacotes R
         run: |
           Rscript -e "install.packages(c(
-            'dplyr', 'jsonlite', 'readxl', 'lubridate', 'httr', 'httr2', 'tidyr', 
-            'purrr', 'stringr', 'xml2', 'rvest', 'curl', 'magrittr', 'tibble', 
-            'readr', 'forcats', 'glue', 'openssl', 'RCurl', 'plyr', 'reshape2', 
-            'rlang', 'cli', 'crayon', 'withr', 'testthat', 'seasonal', 'tidyverse', 'GetBCBData', 'ipeadatar' 
+            'dplyr', 'jsonlite', 'readxl', 'lubridate', 'httr', 'httr2', 'tidyr',
+            'purrr', 'stringr', 'xml2', 'rvest', 'curl', 'magrittr', 'tibble',
+            'readr', 'forcats', 'glue', 'openssl', 'RCurl', 'plyr', 'reshape2',
+            'rlang', 'cli', 'crayon', 'withr', 'testthat',
+            'seasonal', 'tidyverse', 'GetBCBData', 'ipeadatar'
           ), repos='https://cloud.r-project.org/')"
-
-      - name: Listar arquivos e sessão R (debug)
-        run: |
-          echo "=== Arquivos no diretório ==="
-          ls -la
-          echo "=== Pacotes carregados ==="
-          Rscript -e "sessionInfo()"
 
       - name: Executar script de geração do JSON
         run: Rscript gerar_json.R
