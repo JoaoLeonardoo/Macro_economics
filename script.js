@@ -1,4 +1,3 @@
-// Aguarda o carregamento completo do DOM
 document.addEventListener('DOMContentLoaded', function() {
     let dadosCompletos = null;
     let todasColunas = [];
@@ -12,14 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const exportarExcelBtn = document.getElementById('exportarExcel');
     const tabelaHead = document.getElementById('tabelaHead');
     const tabelaBody = document.getElementById('tabelaBody');
-
-    // Função para pausar/retomar a animação da cobra (efeito visual)
-    function toggleCobra(pausar) {
-        const caminho = document.getElementById('caminho-cobra');
-        if (caminho) {
-            caminho.style.animationPlayState = pausar ? 'paused' : 'running';
-        }
-    }
 
     async function buscarDados() {
         try {
@@ -66,10 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function aplicarFiltro() {
         if (!dadosCompletos) return;
-        // Pausa a cobra durante o processamento (efeito)
-        toggleCobra(true);
-        setTimeout(() => toggleCobra(false), 500);
-
         const checkboxes = document.querySelectorAll('#seriesCheckboxes input[type="checkbox"]:checked');
         const colunasMostrar = Array.from(checkboxes).map(cb => cb.value);
         const colunasExibir = colunasMostrar.length > 0 ? colunasMostrar : todasColunas;
@@ -166,11 +153,9 @@ document.addEventListener('DOMContentLoaded', function() {
         aplicarFiltro();
     }
 
-    // Event listeners
     aplicarFiltroBtn.addEventListener('click', aplicarFiltro);
     todasDatasBtn.addEventListener('click', resetarTodasDatas);
     exportarExcelBtn.addEventListener('click', exportarExcel);
 
-    // Iniciar
     buscarDados();
 });
