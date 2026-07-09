@@ -8,12 +8,21 @@
     <!-- ExcelJS para formatação -->
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <style>
-        /* ===== Estilos base (como antes) ===== */
-        body { font-family: Arial, sans-serif; background: #121212; color: #00ff00; padding: 20px; margin: 0; }
+        /* ===== Estilos base ===== */
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #121212; 
+            color: #00ff00; 
+            padding: 20px; 
+            margin: 0; 
+            min-height: 100vh;
+            position: relative;
+        }
         h1 { color: #fff; }
         #atualizacao { color: #888; font-size: 0.9em; margin-bottom: 10px; }
+        
         .filtros {
-            background: #1e1e1e;
+            background: rgba(30, 30, 30, 0.9);
             padding: 15px;
             border-radius: 5px;
             margin-bottom: 20px;
@@ -21,6 +30,9 @@
             flex-wrap: wrap;
             gap: 20px;
             align-items: flex-end;
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(2px);
         }
         .filtros .grupo {
             display: flex;
@@ -36,7 +48,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            background: #2a2a2a;
+            background: rgba(42, 42, 42, 0.9);
             padding: 10px;
             border-radius: 3px;
             max-width: 500px;
@@ -49,7 +61,7 @@
             font-size: 0.9em;
         }
         .filtros input[type="date"] {
-            background: #2a2a2a;
+            background: rgba(42, 42, 42, 0.9);
             color: #0f0;
             border: 1px solid #0f0;
             padding: 8px;
@@ -76,14 +88,18 @@
         .filtros button.secundario:hover {
             background: #666;
         }
+
         .exportar {
-            background: #1e1e1e;
+            background: rgba(30, 30, 30, 0.9);
             padding: 10px 15px;
             border-radius: 5px;
             margin-bottom: 20px;
             display: flex;
             gap: 10px;
             align-items: center;
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(2px);
         }
         .exportar button {
             background: #007acc;
@@ -97,48 +113,69 @@
             background: #005f9e;
         }
 
-        /* ===== Estilo da tabela ===== */
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            background: #1e1e1e;
-            font-size: 0.9em;
-            border: 1px solid #6B8E23;
-        }
-        th {
-            background-color: #6B8E23;
-            color: #fff;
-            padding: 8px;
-            border: 1px solid #6B8E23;
-            position: sticky;
-            top: 0;
-        }
-        td {
-            background-color: #B0C47F;
-            color: #000;
-            padding: 6px;
-            border: 1px solid #6B8E23;
-        }
-        tr:hover td {
-            background-color: #C0D49F;
-        }
+        /* ===== Estilo da tabela (Matrix original) ===== */
         .container-tabela {
             max-height: 500px;
             overflow-y: auto;
-            border: 2px solid #6B8E23;
+            border: 1px solid #00ff00;
             border-radius: 5px;
             position: relative;
+            z-index: 2;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(2px);
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: transparent;
+            font-size: 0.9em;
+            color: #00ff00;
+        }
+        th {
+            background-color: #1a1a1a;
+            color: #00ff00;
+            padding: 8px;
+            border: 1px solid #00ff00;
+            position: sticky;
+            top: 0;
+            z-index: 3;
+        }
+        td {
+            background-color: transparent;
+            color: #00ff00;
+            padding: 6px;
+            border: 1px solid #00ff00;
+        }
+        tr:hover td {
+            background-color: rgba(0, 255, 0, 0.1);
         }
 
-        /* ===== NOVA ANIMAÇÃO: RADAR ===== */
+        /* ===== MATRIX RAIN ===== */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        body > *:not(#matrix-canvas) {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== RADAR (scan) no canto inferior direito ===== */
         .radar-container {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 100px;
-            height: 100px;
+            bottom: 30px;
+            right: 30px;
+            width: 80px;
+            height: 80px;
             z-index: 100;
-            pointer-events: none; /* não atrapalha cliques */
+            pointer-events: none;
             opacity: 0.6;
             transition: opacity 0.3s;
         }
@@ -171,8 +208,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background: #00ff00;
             border-radius: 50%;
             transform: translate(-50%, -50%);
@@ -188,35 +225,38 @@
             50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
             100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
         }
-
-        /* Pequeno rótulo abaixo do radar */
         .radar-label {
             position: absolute;
-            bottom: -25px;
+            bottom: -22px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.6em;
+            font-size: 0.5em;
             color: #00ff00;
             letter-spacing: 2px;
             text-transform: uppercase;
             opacity: 0.5;
         }
 
-        /* Responsivo: esconde o radar em telas muito pequenas */
         @media (max-width: 600px) {
             .radar-container {
                 width: 60px;
                 height: 60px;
-                bottom: 10px;
-                right: 10px;
+                bottom: 15px;
+                right: 15px;
             }
             .radar-label {
                 display: none;
+            }
+            #matrix-canvas {
+                opacity: 0.15;
             }
         }
     </style>
 </head>
 <body>
+    <!-- ===== MATRIX RAIN CANVAS ===== -->
+    <canvas id="matrix-canvas"></canvas>
+
     <h1>Séries Macroeconômicas Trimestrais</h1>
     <div id="atualizacao">Carregando data de atualização...</div>
 
@@ -254,7 +294,7 @@
         </table>
     </div>
 
-    <!-- ===== RADAR ===== -->
+    <!-- RADAR -->
     <div class="radar-container">
         <div class="radar">
             <div class="ponto"></div>
