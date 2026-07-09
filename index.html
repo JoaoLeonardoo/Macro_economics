@@ -2,34 +2,16 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <!-- Título da página que aparece na aba do navegador -->
     <title>Dados Macroeconômicos</title>
-    <!-- Biblioteca ExcelJS para gerar planilhas com formatação (usada na exportação) -->
+    <!-- SheetJS para exportar Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <!-- ExcelJS para formatação (mantido) -->
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <style>
-        /* estilizando*/
-        /* Definimos uma paleta escura com texto verde para combinar com o tema "terminal" */
-        body {
-            font-family: Arial, sans-serif;
-            background: #121212;      /* Fundo escuro */
-            color: #00ff00;            /* Texto verde brilhante */
-            padding: 20px;
-            margin: 0;
-        }
-
-        h1 {
-            color: #fff;               /* Título em branco para destaque */
-        }
-
-        /* Área que mostra a data da última atualização dos dados */
-        #atualizacao {
-            color: #888;
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
-
-        /* area dos filtros */
-        /* Agrupa os controles de filtro em um painel organizado */
+        /* ===== Estilos existentes ===== */
+        body { font-family: Arial, sans-serif; background: #121212; color: #00ff00; padding: 20px; margin: 0; }
+        h1 { color: #fff; }
+        #atualizacao { color: #888; font-size: 0.9em; margin-bottom: 10px; }
         .filtros {
             background: #1e1e1e;
             padding: 15px;
@@ -40,21 +22,16 @@
             gap: 20px;
             align-items: flex-end;
         }
-
-        /* Cada grupo de controle (ex: checkboxes, datas) */
         .filtros .grupo {
             display: flex;
             flex-direction: column;
             min-width: 180px;
         }
-
         .filtros label {
             font-size: 0.8em;
             color: #aaa;
             margin-bottom: 3px;
         }
-
-        /* Área dos checkboxes de séries - usamos flex-wrap para quebra automática */
         .filtros .series-checkboxes {
             display: flex;
             flex-wrap: wrap;
@@ -64,7 +41,6 @@
             border-radius: 3px;
             max-width: 500px;
         }
-
         .filtros .series-checkboxes label {
             display: flex;
             align-items: center;
@@ -72,8 +48,6 @@
             color: #0f0;
             font-size: 0.9em;
         }
-
-        /* Campos de data */
         .filtros input[type="date"] {
             background: #2a2a2a;
             color: #0f0;
@@ -82,8 +56,6 @@
             border-radius: 3px;
             font-family: inherit;
         }
-
-        /* Botões principais (verde) */
         .filtros button {
             background: #0f0;
             color: #000;
@@ -94,22 +66,16 @@
             cursor: pointer;
             transition: 0.3s;
         }
-
         .filtros button:hover {
             background: #0c0;
         }
-
-        /* Botão secundário (cinza) usado para "Todas as datas" tentando pensar no usuário */
         .filtros button.secundario {
             background: #555;
             color: #fff;
         }
-
         .filtros button.secundario:hover {
             background: #666;
         }
-
-        /* exportação excel */
         .exportar {
             background: #1e1e1e;
             padding: 10px 15px;
@@ -119,114 +85,185 @@
             gap: 10px;
             align-items: center;
         }
-
         .exportar button {
-            background: #007acc;       /* Azul para diferenciar das ações de filtro */
+            background: #007acc;
             color: white;
             border: none;
             padding: 8px 16px;
             border-radius: 3px;
             cursor: pointer;
         }
-
         .exportar button:hover {
             background: #005f9e;
         }
 
-        /* tabela*/
-        /* A tabela terá um contêiner com rolagem para não ocupar a tela toda */
-        .container-tabela {
-            max-height: 500px;
-            overflow-y: auto;
-            border: 2px solid #0f0;    /* Borda verde para combinar */
-            border-radius: 5px;
-        }
-
+        /* ===== Estilo da tabela (original) ===== */
         table {
             border-collapse: collapse;
             width: 100%;
             background: #1e1e1e;
-            color: #0f0;
             font-size: 0.9em;
+            border: 1px solid #6B8E23;
         }
-
-        /* Cabeçalho fixo durante a rolagem */
         th {
-            background-color: #2a2a2a;
+            background-color: #6B8E23;
+            color: #fff;
             padding: 8px;
-            border: 1px solid #0f0;
+            border: 1px solid #6B8E23;
             position: sticky;
             top: 0;
-            z-index: 10;               /*tentando garantir que fique sobre as linhas */
         }
-
         td {
+            background-color: #B0C47F;
+            color: #000;
             padding: 6px;
-            border: 1px solid #0f0;
+            border: 1px solid #6B8E23;
+        }
+        tr:hover td {
+            background-color: #C0D49F;
+        }
+        .container-tabela {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 2px solid #6B8E23;
+            border-radius: 5px;
         }
 
-        /* Efeito de hover nas linhas para facilitar leitura */
-        tr:hover td {
-            background-color: #2a2a2a;
+        /* ===== NOVOS ESTILOS: Cobra e Dólar ===== */
+        .cobra-wrapper {
+            position: relative;
+            display: block;  /* ou inline-block conforme layout */
+            margin: 20px auto;
+        }
+
+        .cobra-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;   /* não bloqueia cliques */
+            z-index: 10;
+            overflow: hidden;       /* mantém dentro do wrapper */
+            border-radius: 5px;     /* combina com a borda da tabela */
+        }
+
+        .cobra-svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Animação do traço da cobra */
+        #caminho-cobra {
+            stroke-dasharray: 1440;  /* comprimento total (ajuste) */
+            stroke-dashoffset: 1440;
+            animation: desenharCobra 4s linear infinite;
+        }
+
+        @keyframes desenharCobra {
+            0% { stroke-dashoffset: 1440; }
+            50% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -1440; }
+        }
+
+        /* Brilho na cabeça */
+        circle {
+            filter: drop-shadow(0 0 10px #00ff00);
+        }
+
+        /* Caixa do Dólar no centro */
+        .dolar-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5em;
+            color: #00ff00;
+            background: #121212;
+            padding: 15px 20px;
+            border: 3px solid #00ff00;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            animation: piscarDolar 1.5s ease-in-out infinite alternate;
+            font-weight: bold;
+        }
+
+        @keyframes piscarDolar {
+            0% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.95); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        /* Pequeno ajuste para a tabela dentro do wrapper */
+        .cobra-wrapper .container-tabela {
+            margin: 0; /* remove margens extras */
+            border: 2px solid #6B8E23;
         }
     </style>
 </head>
 <body>
-    <!-- Cabeçalho principal -->
-    <h1>Séries Macroeconômicas Mensais</h1>
-    
-    <!-- Elemento que será preenchido via JavaScript com a data da última atualização do JSON -->
+    <h1>Séries Macroeconômicas Trimestrais</h1>
     <div id="atualizacao">Carregando data de atualização...</div>
 
-    <!-- filtros -->
+    <!-- Área de filtros (existente) -->
     <div class="filtros">
-        <!-- Grupo de checkboxes para selecionar as séries desejadas -->
         <div class="grupo">
             <label>Séries (marque as desejadas):</label>
             <div id="seriesCheckboxes" class="series-checkboxes">
-                <!-- Os checkboxes serão gerados dinamicamente pelo JavaScript -->
+                <!-- preenchido via JavaScript -->
             </div>
         </div>
-
-        <!-- Grupo para selecionar a data inicial -->
         <div class="grupo">
             <label>Data inicial:</label>
             <input type="date" id="startDate">
         </div>
-
-        <!-- Grupo para selecionar a data final -->
         <div class="grupo">
             <label>Data final:</label>
             <input type="date" id="endDate">
         </div>
-
-        <!-- Botões de ação -->
         <div class="grupo" style="flex-direction: row; gap: 10px;">
-            <!-- Botão verde: aplica os filtros selecionados -->
             <button id="aplicarFiltro">Aplicar filtro</button>
-            <!-- Botão cinza: restaura o período completo (todas as datas disponíveis) -->
             <button id="todasDatas" class="secundario">Todas as datas</button>
         </div>
     </div>
 
-    <!-- painel de exportação -->
+    <!-- Área de exportação (existente) -->
     <div class="exportar">
         <span>Exportar dados filtrados:</span>
-        <!-- Botão azul que aciona a exportação para Excel com formatação especial -->
         <button id="exportarExcel">📥 Excel (XLSX)</button>
     </div>
 
-    <!-- resultado?-->
-    <div class="container-tabela">
-        <table id="tabelaDados">
-            <!-- Cabeçalho da tabela (nomes das colunas) será preenchido via JS -->
-            <thead id="tabelaHead"></thead>
-            <!-- Corpo da tabela (linhas de dados) será preenchido via JS -->
-            <tbody id="tabelaBody"></tbody>
-        </table>
+    <!-- ===== CONTAINER COM A COBRA ===== -->
+    <div class="cobra-wrapper">
+        <!-- Overlay com a cobra e o dólar -->
+        <div class="cobra-overlay">
+            <svg class="cobra-svg" viewBox="0 0 400 400" preserveAspectRatio="none">
+                <!-- Caminho da cobra (borda arredondada) -->
+                <path id="caminho-cobra" d="M 20 20 H 380 V 380 H 20 Z" 
+                      stroke="#00ff00" stroke-width="6" fill="none" 
+                      stroke-dasharray="1440" stroke-dashoffset="1440" />
+                <!-- Cabeça da cobra (círculo que segue o caminho) -->
+                <circle r="10" fill="#00ff00">
+                    <animateMotion dur="4s" repeatCount="indefinite">
+                        <mpath href="#caminho-cobra" />
+                    </animateMotion>
+                </circle>
+            </svg>
+            <!-- Símbolo do dólar -->
+            <div class="dolar-box">
+                <span>$</span>
+            </div>
+        </div>
+
+        <!-- Tabela (existente) -->
+        <div class="container-tabela">
+            <table id="tabelaDados">
+                <thead id="tabelaHead"></thead>
+                <tbody id="tabelaBody"></tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- Inclusão do arquivo JavaScript externo que contém toda a lógica da aplicação -->
     <script src="script.js"></script>
 </body>
 </html>
