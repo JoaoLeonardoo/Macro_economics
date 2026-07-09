@@ -5,10 +5,10 @@
     <title>Dados Macroeconômicos</title>
     <!-- SheetJS para exportar Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-    <!-- ExcelJS para formatação (mantido) -->
+    <!-- ExcelJS para formatação -->
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <style>
-        /* ===== Estilos existentes ===== */
+        /* ===== Estilos base (como antes) ===== */
         body { font-family: Arial, sans-serif; background: #121212; color: #00ff00; padding: 20px; margin: 0; }
         h1 { color: #fff; }
         #atualizacao { color: #888; font-size: 0.9em; margin-bottom: 10px; }
@@ -97,7 +97,7 @@
             background: #005f9e;
         }
 
-        /* ===== Estilo da tabela (original) ===== */
+        /* ===== Estilo da tabela ===== */
         table {
             border-collapse: collapse;
             width: 100%;
@@ -127,77 +127,92 @@
             overflow-y: auto;
             border: 2px solid #6B8E23;
             border-radius: 5px;
-        }
-
-        /* ===== NOVOS ESTILOS: Cobra e Dólar ===== */
-        .cobra-wrapper {
             position: relative;
-            display: block;  /* ou inline-block conforme layout */
-            margin: 20px auto;
         }
 
-        .cobra-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
+        /* ===== NOVA ANIMAÇÃO: RADAR ===== */
+        .radar-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 100px;
+            height: 100px;
+            z-index: 100;
+            pointer-events: none; /* não atrapalha cliques */
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+        .radar-container:hover {
+            opacity: 1;
+        }
+        .radar {
             width: 100%;
             height: 100%;
-            pointer-events: none;   /* não bloqueia cliques */
-            z-index: 10;
-            overflow: hidden;       /* mantém dentro do wrapper */
-            border-radius: 5px;     /* combina com a borda da tabela */
+            border-radius: 50%;
+            border: 2px solid #00ff00;
+            position: relative;
+            background: rgba(0, 255, 0, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
         }
-
-        .cobra-svg {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        /* Animação do traço da cobra */
-        #caminho-cobra {
-            stroke-dasharray: 1440;  /* comprimento total (ajuste) */
-            stroke-dashoffset: 1440;
-            animation: desenharCobra 4s linear infinite;
-        }
-
-        @keyframes desenharCobra {
-            0% { stroke-dashoffset: 1440; }
-            50% { stroke-dashoffset: 0; }
-            100% { stroke-dashoffset: -1440; }
-        }
-
-        /* Brilho na cabeça */
-        circle {
-            filter: drop-shadow(0 0 10px #00ff00);
-        }
-
-        /* Caixa do Dólar no centro */
-        .dolar-box {
+        .radar::after {
+            content: '';
             position: absolute;
             top: 50%;
             left: 50%;
+            width: 60%;
+            height: 2px;
+            background: #00ff00;
+            transform-origin: left center;
+            transform: translate(0, -50%) rotate(0deg);
+            animation: girar 3s linear infinite;
+            box-shadow: 0 0 8px #00ff00;
+        }
+        .radar .ponto {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: #00ff00;
+            border-radius: 50%;
             transform: translate(-50%, -50%);
-            font-size: 2.5em;
+            animation: pulsar 1.5s ease-in-out infinite;
+            box-shadow: 0 0 15px #00ff00;
+        }
+        @keyframes girar {
+            from { transform: translate(0, -50%) rotate(0deg); }
+            to { transform: translate(0, -50%) rotate(360deg); }
+        }
+        @keyframes pulsar {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+        }
+
+        /* Pequeno rótulo abaixo do radar */
+        .radar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6em;
             color: #00ff00;
-            background: #121212;
-            padding: 15px 20px;
-            border: 3px solid #00ff00;
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
-            animation: piscarDolar 1.5s ease-in-out infinite alternate;
-            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.5;
         }
 
-        @keyframes piscarDolar {
-            0% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.95); }
-            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
-        }
-
-        /* Pequeno ajuste para a tabela dentro do wrapper */
-        .cobra-wrapper .container-tabela {
-            margin: 0; /* remove margens extras */
-            border: 2px solid #6B8E23;
+        /* Responsivo: esconde o radar em telas muito pequenas */
+        @media (max-width: 600px) {
+            .radar-container {
+                width: 60px;
+                height: 60px;
+                bottom: 10px;
+                right: 10px;
+            }
+            .radar-label {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -205,13 +220,11 @@
     <h1>Séries Macroeconômicas Trimestrais</h1>
     <div id="atualizacao">Carregando data de atualização...</div>
 
-    <!-- Área de filtros (existente) -->
+    <!-- Filtros -->
     <div class="filtros">
         <div class="grupo">
             <label>Séries (marque as desejadas):</label>
-            <div id="seriesCheckboxes" class="series-checkboxes">
-                <!-- preenchido via JavaScript -->
-            </div>
+            <div id="seriesCheckboxes" class="series-checkboxes"></div>
         </div>
         <div class="grupo">
             <label>Data inicial:</label>
@@ -227,40 +240,25 @@
         </div>
     </div>
 
-    <!-- Área de exportação (existente) -->
+    <!-- Exportação -->
     <div class="exportar">
         <span>Exportar dados filtrados:</span>
         <button id="exportarExcel">📥 Excel (XLSX)</button>
     </div>
 
-    <!-- ===== CONTAINER COM A COBRA ===== -->
-    <div class="cobra-wrapper">
-        <!-- Overlay com a cobra e o dólar -->
-        <div class="cobra-overlay">
-            <svg class="cobra-svg" viewBox="0 0 400 400" preserveAspectRatio="none">
-                <!-- Caminho da cobra (borda arredondada) -->
-                <path id="caminho-cobra" d="M 20 20 H 380 V 380 H 20 Z" 
-                      stroke="#00ff00" stroke-width="6" fill="none" 
-                      stroke-dasharray="1440" stroke-dashoffset="1440" />
-                <!-- Cabeça da cobra (círculo que segue o caminho) -->
-                <circle r="10" fill="#00ff00">
-                    <animateMotion dur="4s" repeatCount="indefinite">
-                        <mpath href="#caminho-cobra" />
-                    </animateMotion>
-                </circle>
-            </svg>
-            <!-- Símbolo do dólar -->
-            <div class="dolar-box">
-                <span>$</span>
-            </div>
-        </div>
+    <!-- Tabela -->
+    <div class="container-tabela">
+        <table id="tabelaDados">
+            <thead id="tabelaHead"></thead>
+            <tbody id="tabelaBody"></tbody>
+        </table>
+    </div>
 
-        <!-- Tabela (existente) -->
-        <div class="container-tabela">
-            <table id="tabelaDados">
-                <thead id="tabelaHead"></thead>
-                <tbody id="tabelaBody"></tbody>
-            </table>
+    <!-- ===== RADAR ===== -->
+    <div class="radar-container">
+        <div class="radar">
+            <div class="ponto"></div>
+            <div class="radar-label">SCAN</div>
         </div>
     </div>
 
