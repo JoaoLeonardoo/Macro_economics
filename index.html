@@ -9,8 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <style>
         /* ===== Estilos base ===== */
+        * { box-sizing: border-box; }
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: 'Courier New', monospace; 
             background: #121212; 
             color: #00ff00; 
             padding: 20px; 
@@ -18,13 +19,15 @@
             min-height: 100vh;
             position: relative;
         }
-        h1 { color: #fff; }
-        #atualizacao { color: #888; font-size: 0.9em; margin-bottom: 10px; }
+        h1 { color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.3); }
+        #atualizacao { color: #555; font-size: 0.8em; margin-bottom: 15px; }
         
+        /* Filtros com fundo escuro e borda verde */
         .filtros {
-            background: rgba(30, 30, 30, 0.9);
+            background: rgba(18, 18, 18, 0.9);
             padding: 15px;
             border-radius: 5px;
+            border: 1px solid #00ff00;
             margin-bottom: 20px;
             display: flex;
             flex-wrap: wrap;
@@ -41,35 +44,42 @@
         }
         .filtros label {
             font-size: 0.8em;
-            color: #aaa;
+            color: #00ff00;
             margin-bottom: 3px;
         }
         .filtros .series-checkboxes {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            background: rgba(42, 42, 42, 0.9);
+            background: rgba(0, 0, 0, 0.7);
             padding: 10px;
             border-radius: 3px;
+            border: 1px solid #00ff00;
             max-width: 500px;
         }
         .filtros .series-checkboxes label {
             display: flex;
             align-items: center;
             gap: 5px;
-            color: #0f0;
-            font-size: 0.9em;
+            color: #00ff00;
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+        .filtros .series-checkboxes input[type="checkbox"] {
+            accent-color: #00ff00;
+            width: 16px;
+            height: 16px;
         }
         .filtros input[type="date"] {
-            background: rgba(42, 42, 42, 0.9);
-            color: #0f0;
-            border: 1px solid #0f0;
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
             padding: 8px;
             border-radius: 3px;
             font-family: inherit;
         }
         .filtros button {
-            background: #0f0;
+            background: #00ff00;
             color: #000;
             border: none;
             padding: 10px 20px;
@@ -77,22 +87,26 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
+            font-family: inherit;
         }
         .filtros button:hover {
-            background: #0c0;
+            background: #00cc00;
+            box-shadow: 0 0 15px rgba(0,255,0,0.5);
         }
         .filtros button.secundario {
-            background: #555;
-            color: #fff;
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
         }
         .filtros button.secundario:hover {
-            background: #666;
+            background: #444;
         }
 
         .exportar {
-            background: rgba(30, 30, 30, 0.9);
+            background: rgba(18, 18, 18, 0.9);
             padding: 10px 15px;
             border-radius: 5px;
+            border: 1px solid #00ff00;
             margin-bottom: 20px;
             display: flex;
             gap: 10px;
@@ -101,27 +115,33 @@
             z-index: 2;
             backdrop-filter: blur(2px);
         }
+        .exportar span {
+            color: #00ff00;
+        }
         .exportar button {
-            background: #007acc;
-            color: white;
-            border: none;
+            background: #003366;
+            color: #00ff00;
+            border: 1px solid #00ff00;
             padding: 8px 16px;
             border-radius: 3px;
             cursor: pointer;
+            font-family: inherit;
+            transition: 0.3s;
         }
         .exportar button:hover {
-            background: #005f9e;
+            background: #004488;
+            box-shadow: 0 0 10px rgba(0,255,0,0.3);
         }
 
-        /* ===== Estilo da tabela (Matrix original) ===== */
+        /* ===== Tabela estilo Matrix (sem cores de fundo) ===== */
         .container-tabela {
             max-height: 500px;
             overflow-y: auto;
-            border: 1px solid #00ff00;
+            border: 2px solid #00ff00;
             border-radius: 5px;
             position: relative;
             z-index: 2;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(2px);
         }
         table {
@@ -132,22 +152,36 @@
             color: #00ff00;
         }
         th {
-            background-color: #1a1a1a;
+            background: #000;
             color: #00ff00;
             padding: 8px;
             border: 1px solid #00ff00;
             position: sticky;
             top: 0;
             z-index: 3;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         td {
-            background-color: transparent;
+            background: transparent;
             color: #00ff00;
             padding: 6px;
             border: 1px solid #00ff00;
         }
         tr:hover td {
-            background-color: rgba(0, 255, 0, 0.1);
+            background: rgba(0, 255, 0, 0.05);
+        }
+        /* Scrollbar personalizada (opcional) */
+        .container-tabela::-webkit-scrollbar {
+            width: 8px;
+        }
+        .container-tabela::-webkit-scrollbar-track {
+            background: #000;
+        }
+        .container-tabela::-webkit-scrollbar-thumb {
+            background: #00ff00;
+            border-radius: 4px;
         }
 
         /* ===== MATRIX RAIN ===== */
@@ -159,22 +193,23 @@
             height: 100%;
             z-index: 0;
             pointer-events: none;
-            opacity: 0.3;
+            opacity: 0.25;
         }
 
+        /* Todos os elementos interativos ficam acima do canvas */
         body > *:not(#matrix-canvas) {
             position: relative;
             z-index: 1;
         }
 
-        /* ===== RADAR (scan) no canto inferior direito ===== */
+        /* ===== RADAR (canto inferior direito, fixo) ===== */
         .radar-container {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 80px;
-            height: 80px;
-            z-index: 100;
+            bottom: 25px;
+            right: 25px;
+            width: 100px;
+            height: 100px;
+            z-index: 999;
             pointer-events: none;
             opacity: 0.6;
             transition: opacity 0.3s;
@@ -188,8 +223,8 @@
             border-radius: 50%;
             border: 2px solid #00ff00;
             position: relative;
-            background: rgba(0, 255, 0, 0.05);
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            background: rgba(0, 255, 0, 0.03);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.15);
         }
         .radar::after {
             content: '';
@@ -202,41 +237,43 @@
             transform-origin: left center;
             transform: translate(0, -50%) rotate(0deg);
             animation: girar 3s linear infinite;
-            box-shadow: 0 0 8px #00ff00;
+            box-shadow: 0 0 12px #00ff00;
         }
         .radar .ponto {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             background: #00ff00;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             animation: pulsar 1.5s ease-in-out infinite;
-            box-shadow: 0 0 15px #00ff00;
+            box-shadow: 0 0 20px #00ff00;
         }
         @keyframes girar {
             from { transform: translate(0, -50%) rotate(0deg); }
             to { transform: translate(0, -50%) rotate(360deg); }
         }
         @keyframes pulsar {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
-            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            50% { transform: translate(-50%, -50%) scale(1.6); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
         }
         .radar-label {
             position: absolute;
-            bottom: -22px;
+            bottom: -28px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.5em;
+            font-size: 0.55em;
             color: #00ff00;
             letter-spacing: 2px;
             text-transform: uppercase;
             opacity: 0.5;
+            font-family: 'Courier New', monospace;
         }
 
+        /* Responsivo */
         @media (max-width: 600px) {
             .radar-container {
                 width: 60px;
@@ -250,14 +287,17 @@
             #matrix-canvas {
                 opacity: 0.15;
             }
+            .filtros .series-checkboxes {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- ===== MATRIX RAIN CANVAS ===== -->
+    <!-- Canvas do Matrix Rain -->
     <canvas id="matrix-canvas"></canvas>
 
-    <h1>Séries Macroeconômicas Trimestrais</h1>
+    <h1>📊 Séries Macroeconômicas Trimestrais</h1>
     <div id="atualizacao">Carregando data de atualização...</div>
 
     <!-- Filtros -->
@@ -282,8 +322,8 @@
 
     <!-- Exportação -->
     <div class="exportar">
-        <span>Exportar dados filtrados:</span>
-        <button id="exportarExcel">📥 Excel (XLSX)</button>
+        <span>📥 Exportar dados filtrados:</span>
+        <button id="exportarExcel">Excel (XLSX)</button>
     </div>
 
     <!-- Tabela -->
@@ -294,7 +334,7 @@
         </table>
     </div>
 
-    <!-- RADAR -->
+    <!-- Radar fixo no canto inferior direito -->
     <div class="radar-container">
         <div class="radar">
             <div class="ponto"></div>
