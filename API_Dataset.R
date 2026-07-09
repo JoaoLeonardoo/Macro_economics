@@ -22,28 +22,18 @@
 # Utilização da Capacidade Instalada (Indústria)
 # Superávit Primáriio do Governo Consolidado (R$ Milhões)
 
-# -------------------------- #
-# --- Quartely Databases --- #
-# -------------------------- #
 
-
-
-
-# ======================================= #
-# === 1. Source Scripts and Libraries === #
-# ======================================= #
 source("Bacen_Query.R")
 source("Ipeadata_Query.R")
 source("Sidra_Query.R")
 source("Variables_Frequency_Transforming.R")
 
-
-
+library(dplyr)
+library(lubridate)
 
 # ========================== #
 # === 2. Data Extraction === #
 # ========================== #
-
 
 # ------------------- #
 # --- 2.1 Monthly --- #
@@ -64,13 +54,12 @@ ipeadata_monthly_dataset = ipeadata_query(cod_ipeadata_monthly_series, name_ipea
 ipeadata_monthly_dataset = ipeadata_monthly_dataset %>% mutate('ipca_%' = (ipca/lag(ipca) - 1)*100)
 bacen_monthly_dataset = bacen_query(cod_bacen_monthly_series, name_bacen_monthly_series, '01/01/2010', '31/12/2025')
 bacen_monthly_dataset[c(-1)] = lapply(X = bacen_monthly_dataset[c(-1)], FUN = as.numeric)
-sidra_monthly_dataset = sidra_query(sidra_query_list, TRUE)
+sidra_monthly_dataset = sidra_query(sidra_query_list)
 
 # --- Date Adjustment --- #
 ipeadata_monthly_dataset = ipeadata_monthly_dataset %>% mutate(data = as.Date(data))
 bacen_monthly_dataset = bacen_monthly_dataset %>% mutate(data = as.Date(data, tryFormats = c('%d/%m/%Y')))
 sidra_monthly_dataset = sidra_monthly_dataset %>% mutate(data = as.Date(paste0(substr(data, 1, 4), '-', substr(data, 5, 6), '-01')))
-
 
 # -------------------- #
 # --- 2.2 Quartely --- #
@@ -87,18 +76,13 @@ sidra_query_list = vector(mode = 'list')
 sidra_query_list[['pib']] = list(table = '2072', time_interval = '201001-202504', variables = '933', territorial_level = 'n1/all', headers = FALSE)
 sidra_query_list[['sal_medio']] = list(table = '6470', time_interval = '201001-202504', variables = '5934', territorial_level = 'n1/all', headers = FALSE)
 
-
 # --- Extraction --- #
 ipeadata_quartely_dataset = ipeadata_query(cod_ipeadata_quartely_series, name_ipeadata_quartely_series, as.character(2010:2025))
-sidra_quartely_dataset = sidra_query(sidra_query_list, TRUE)
-#bacen_quartely_dataset = bacen_query(cod_bacen_quartely_series, name_bacen_quartely_series, '01/01/2010', '31/12/2025')
-
+sidra_quartely_dataset = sidra_query(sidra_query_list)
 
 # --- Date Adjustment --- #
 ipeadata_quartely_dataset = ipeadata_quartely_dataset %>% mutate(data = as.Date(data))
 sidra_quartely_dataset = sidra_quartely_dataset %>% mutate(data = paste0(substr(data, 1, 4), '_Q', substr(data, 6, 6)))
-#bacen_quartely_dataset = bacen_quartely_dataset %>% mutate(data = as.Date(data, tryFormats = c('%d/%m/%Y')))
-
 
 # ------------------ #
 # --- 2.3 Yearly --- #
@@ -111,10 +95,6 @@ name_bacen_yearly_series = c('meta_inf')
 # --- Extraction --- #
 bacen_yearly_dataset = bacen_query(cod_bacen_yearly_series, name_bacen_yearly_series, '01/01/2010', '31/12/2025')
 
-
-
-
-
 # ============================================== #
 # === 3. Data Frequency Cumulative Transform === #
 # ============================================== #
@@ -125,7 +105,6 @@ db_transform_ipeadata_quartely_cumrate = cumulative_transform('cumulative_rate',
 db_transform_ipeadata_quartely_mean = cumulative_transform('mean', 'quartely', ipeadata_monthly_dataset[c(1,5)], change_date = TRUE)
 db_transform_ipeadata_quartely_none = cumulative_transform('none', 'quartely', ipeadata_quartely_dataset, change_date = TRUE)
 
-
 # --- Monthly Bacen Database --- #
 db_transform_bacen_quartely_end = cumulative_transform('final_period', 'quartely', bacen_monthly_dataset[c(1,4)], change_date = TRUE)
 db_transform_bacen_quartely_cumrate = cumulative_transform('cumulative_rate', 'quartely', bacen_monthly_dataset[c(1,5,6)], change_date = TRUE)
@@ -133,10 +112,6 @@ db_transform_bacen_quartely_mean = cumulative_transform('mean', 'quartely', bace
 
 # --- Monthly Sidra Database --- #
 db_transform_sidra_quartely_end = cumulative_transform('final_period', 'quartely', sidra_monthly_dataset[c(1,2)], change_date = TRUE)
-
-
-
-
 
 # ==================================== #
 # === 4. Combining Quartely Series === #
@@ -146,7 +121,6 @@ db_transform_sidra_quartely_end = cumulative_transform('final_period', 'quartely
 db_transform_ipeadata_quartely = left_join(x = db_transform_ipeadata_quartely_sum, y = db_transform_ipeadata_quartely_cumrate, by = 'data')
 db_transform_ipeadata_quartely = left_join(x = db_transform_ipeadata_quartely, y = db_transform_ipeadata_quartely_mean, by = 'data')
 db_transform_ipeadata_quartely = left_join(x = db_transform_ipeadata_quartely, y = db_transform_ipeadata_quartely_none, by = 'data')
-
 
 # --- Bacen --- #
 db_transform_bacen_quartely = left_join(x = db_transform_bacen_quartely_end, y = db_transform_bacen_quartely_cumrate, by = 'data')
@@ -158,10 +132,6 @@ db_transform_sidra_quartely = left_join(x = db_transform_sidra_quartely_end, y =
 # --- Final Dataset --- #
 final_dataset = left_join(x = db_transform_ipeadata_quartely, y = db_transform_bacen_quartely, by = 'data')
 final_dataset = left_join(x = final_dataset, y = db_transform_sidra_quartely, by = 'data')
-
-
-
-
 
 # =================== #
 # === 5. Cleasing === #
