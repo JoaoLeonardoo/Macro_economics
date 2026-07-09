@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Dados Macroeconômicos</title>
-    <!-- SheetJS para exportar Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-    <!-- ExcelJS para formatação -->
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <style>
-        /* ===== Estilos base ===== */
         * { box-sizing: border-box; }
         body { 
             font-family: 'Courier New', monospace; 
@@ -21,8 +18,8 @@
         }
         h1 { color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.3); }
         #atualizacao { color: #555; font-size: 0.8em; margin-bottom: 15px; }
-        
-        /* Filtros com fundo escuro e borda verde */
+
+        /* Filtros */
         .filtros {
             background: rgba(18, 18, 18, 0.9);
             padding: 15px;
@@ -35,7 +32,6 @@
             align-items: flex-end;
             position: relative;
             z-index: 2;
-            backdrop-filter: blur(2px);
         }
         .filtros .grupo {
             display: flex;
@@ -113,7 +109,6 @@
             align-items: center;
             position: relative;
             z-index: 2;
-            backdrop-filter: blur(2px);
         }
         .exportar span {
             color: #00ff00;
@@ -133,7 +128,7 @@
             box-shadow: 0 0 10px rgba(0,255,0,0.3);
         }
 
-        /* ===== Tabela estilo Matrix (sem cores de fundo) ===== */
+        /* Tabela estilo Matrix (sem cores de fundo) */
         .container-tabela {
             max-height: 500px;
             overflow-y: auto;
@@ -142,7 +137,6 @@
             position: relative;
             z-index: 2;
             background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(2px);
         }
         table {
             border-collapse: collapse;
@@ -172,7 +166,6 @@
         tr:hover td {
             background: rgba(0, 255, 0, 0.05);
         }
-        /* Scrollbar personalizada (opcional) */
         .container-tabela::-webkit-scrollbar {
             width: 8px;
         }
@@ -184,7 +177,7 @@
             border-radius: 4px;
         }
 
-        /* ===== MATRIX RAIN ===== */
+        /* MATRIX RAIN - agora com opacidade 0.4 */
         #matrix-canvas {
             position: fixed;
             top: 0;
@@ -193,25 +186,24 @@
             height: 100%;
             z-index: 0;
             pointer-events: none;
-            opacity: 0.25;
+            opacity: 0.4;
         }
 
-        /* Todos os elementos interativos ficam acima do canvas */
         body > *:not(#matrix-canvas) {
             position: relative;
             z-index: 1;
         }
 
-        /* ===== RADAR (canto inferior direito, fixo) ===== */
+        /* RADAR - canto inferior direito, bem no canto */
         .radar-container {
             position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 100px;
-            height: 100px;
+            bottom: 10px;
+            right: 10px;
+            width: 80px;
+            height: 80px;
             z-index: 999;
             pointer-events: none;
-            opacity: 0.6;
+            opacity: 0.7;
             transition: opacity 0.3s;
         }
         .radar-container:hover {
@@ -231,7 +223,7 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 60%;
+            width: 55%;
             height: 2px;
             background: #00ff00;
             transform-origin: left center;
@@ -243,8 +235,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             background: #00ff00;
             border-radius: 50%;
             transform: translate(-50%, -50%);
@@ -262,10 +254,10 @@
         }
         .radar-label {
             position: absolute;
-            bottom: -28px;
+            bottom: -24px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.55em;
+            font-size: 0.5em;
             color: #00ff00;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -273,19 +265,18 @@
             font-family: 'Courier New', monospace;
         }
 
-        /* Responsivo */
         @media (max-width: 600px) {
             .radar-container {
                 width: 60px;
                 height: 60px;
-                bottom: 15px;
-                right: 15px;
+                bottom: 8px;
+                right: 8px;
             }
             .radar-label {
                 display: none;
             }
             #matrix-canvas {
-                opacity: 0.15;
+                opacity: 0.25;
             }
             .filtros .series-checkboxes {
                 max-width: 100%;
@@ -294,13 +285,11 @@
     </style>
 </head>
 <body>
-    <!-- Canvas do Matrix Rain -->
     <canvas id="matrix-canvas"></canvas>
 
     <h1>📊 Séries Macroeconômicas Trimestrais</h1>
     <div id="atualizacao">Carregando data de atualização...</div>
 
-    <!-- Filtros -->
     <div class="filtros">
         <div class="grupo">
             <label>Séries (marque as desejadas):</label>
@@ -320,13 +309,11 @@
         </div>
     </div>
 
-    <!-- Exportação -->
     <div class="exportar">
         <span>📥 Exportar dados filtrados:</span>
         <button id="exportarExcel">Excel (XLSX)</button>
     </div>
 
-    <!-- Tabela -->
     <div class="container-tabela">
         <table id="tabelaDados">
             <thead id="tabelaHead"></thead>
