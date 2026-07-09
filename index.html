@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dados Macroeconômicos</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
@@ -16,8 +17,28 @@
             min-height: 100vh;
             position: relative;
         }
-        h1 { color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.3); }
-        #atualizacao { color: #555; font-size: 0.8em; margin-bottom: 15px; }
+        
+        h1 { 
+            color: #00ff00; 
+            text-shadow: 0 0 10px rgba(0,255,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0 0 10px 0;
+        }
+        
+        h1:hover {
+            text-shadow: 0 0 20px rgba(0,255,0,0.6);
+        }
+        
+        h1.clickable:active {
+            transform: scale(0.98);
+        }
+        
+        #atualizacao { 
+            color: #555; 
+            font-size: 0.8em; 
+            margin-bottom: 15px; 
+        }
 
         /* Filtros */
         .filtros {
@@ -33,16 +54,19 @@
             position: relative;
             z-index: 2;
         }
+        
         .filtros .grupo {
             display: flex;
             flex-direction: column;
             min-width: 180px;
         }
+        
         .filtros label {
             font-size: 0.8em;
             color: #00ff00;
             margin-bottom: 3px;
         }
+        
         .filtros .series-checkboxes {
             display: flex;
             flex-wrap: wrap;
@@ -53,6 +77,7 @@
             border: 1px solid #00ff00;
             max-width: 500px;
         }
+        
         .filtros .series-checkboxes label {
             display: flex;
             align-items: center;
@@ -61,11 +86,13 @@
             font-size: 0.85em;
             cursor: pointer;
         }
+        
         .filtros .series-checkboxes input[type="checkbox"] {
             accent-color: #00ff00;
             width: 16px;
             height: 16px;
         }
+        
         .filtros input[type="date"] {
             background: #000;
             color: #00ff00;
@@ -74,6 +101,7 @@
             border-radius: 3px;
             font-family: inherit;
         }
+        
         .filtros button {
             background: #00ff00;
             color: #000;
@@ -85,15 +113,18 @@
             transition: 0.3s;
             font-family: inherit;
         }
+        
         .filtros button:hover {
             background: #00cc00;
             box-shadow: 0 0 15px rgba(0,255,0,0.5);
         }
+        
         .filtros button.secundario {
             background: #333;
             color: #00ff00;
             border: 1px solid #00ff00;
         }
+        
         .filtros button.secundario:hover {
             background: #444;
         }
@@ -109,10 +140,13 @@
             align-items: center;
             position: relative;
             z-index: 2;
+            flex-wrap: wrap;
         }
+        
         .exportar span {
             color: #00ff00;
         }
+        
         .exportar button {
             background: #003366;
             color: #00ff00;
@@ -123,12 +157,13 @@
             font-family: inherit;
             transition: 0.3s;
         }
+        
         .exportar button:hover {
             background: #004488;
             box-shadow: 0 0 10px rgba(0,255,0,0.3);
         }
 
-        /* Tabela estilo Matrix (sem cores de fundo) */
+        /* Tabela estilo Matrix */
         .container-tabela {
             max-height: 500px;
             overflow-y: auto;
@@ -137,7 +172,9 @@
             position: relative;
             z-index: 2;
             background: rgba(0, 0, 0, 0.85);
+            margin-bottom: 30px;
         }
+        
         table {
             border-collapse: collapse;
             width: 100%;
@@ -145,6 +182,7 @@
             font-size: 0.9em;
             color: #00ff00;
         }
+        
         th {
             background: #000;
             color: #00ff00;
@@ -157,27 +195,109 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+        
         td {
             background: transparent;
             color: #00ff00;
             padding: 6px;
             border: 1px solid #00ff00;
         }
+        
         tr:hover td {
             background: rgba(0, 255, 0, 0.05);
         }
+        
         .container-tabela::-webkit-scrollbar {
             width: 8px;
         }
+        
         .container-tabela::-webkit-scrollbar-track {
             background: #000;
         }
+        
         .container-tabela::-webkit-scrollbar-thumb {
             background: #00ff00;
             border-radius: 4px;
         }
 
-        /* MATRIX RAIN - agora com opacidade 0.4 */
+        /* Seção de Autores */
+        .autores-section {
+            background: rgba(18, 18, 18, 0.9);
+            padding: 25px;
+            border-radius: 5px;
+            border: 1px solid #00ff00;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .autores-section h2 {
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0,255,0,0.3);
+            margin-top: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+        }
+        
+        .autores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .autor-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .autor-foto {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .autor-foto img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .autor-foto.placeholder {
+            font-size: 0.8em;
+            color: #00ff00;
+            opacity: 0.5;
+        }
+        
+        .autor-nome {
+            color: #00ff00;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .autor-cargo {
+            color: #888;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+
+        /* MATRIX RAIN */
         #matrix-canvas {
             position: fixed;
             top: 0;
@@ -194,7 +314,7 @@
             z-index: 1;
         }
 
-        /* RADAR - canto inferior direito, bem no canto */
+        /* RADAR - canto inferior direito */
         .radar-container {
             position: fixed;
             bottom: -50px;
@@ -202,13 +322,16 @@
             width: 80px;
             height: 80px;
             z-index: 999;
-            pointer-events: none;
+            pointer-events: auto;
             opacity: 0.7;
             transition: opacity 0.3s;
+            cursor: pointer;
         }
+        
         .radar-container:hover {
             opacity: 1;
         }
+        
         .radar {
             width: 100%;
             height: 100%;
@@ -218,6 +341,7 @@
             background: rgba(0, 255, 0, 0.03);
             box-shadow: 0 0 30px rgba(0, 255, 0, 0.15);
         }
+        
         .radar::after {
             content: '';
             position: absolute;
@@ -231,6 +355,7 @@
             animation: girar 3s linear infinite;
             box-shadow: 0 0 12px #00ff00;
         }
+        
         .radar .ponto {
             position: absolute;
             top: 50%;
@@ -243,15 +368,18 @@
             animation: pulsar 1.5s ease-in-out infinite;
             box-shadow: 0 0 20px #00ff00;
         }
+        
         @keyframes girar {
             from { transform: translate(0, -50%) rotate(0deg); }
             to { transform: translate(0, -50%) rotate(360deg); }
         }
+        
         @keyframes pulsar {
             0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
             50% { transform: translate(-50%, -50%) scale(1.6); opacity: 1; }
             100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
         }
+        
         .radar-label {
             position: absolute;
             bottom: -24px;
@@ -265,21 +393,242 @@
             font-family: 'Courier New', monospace;
         }
 
-        @media (max-width: 600px) {
+        /* Modal do Jogo da Cobrinha */
+        #snakeModal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #snakeModal.show {
+            display: flex;
+        }
+        
+        .snake-container {
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+            position: relative;
+        }
+        
+        .snake-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+        }
+        
+        .snake-header h2 {
+            color: #00ff00;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .snake-close {
+            background: none;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            font-size: 1.5em;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+        
+        .snake-close:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        #snakeCanvas {
+            display: block;
+            background: #000;
+            border: 2px solid #00ff00;
+            margin: 0 auto 15px;
+        }
+        
+        .snake-info {
+            display: flex;
+            justify-content: space-around;
+            color: #00ff00;
+            margin-bottom: 15px;
+            text-align: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .snake-info div {
+            flex: 1;
+            min-width: 100px;
+        }
+        
+        .snake-info-label {
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+        
+        .snake-info-value {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        
+        .snake-controls {
+            text-align: center;
+            color: #00ff00;
+            font-size: 0.9em;
+        }
+
+        /* Responsividade Mobile */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.3em;
+            }
+            
+            .filtros {
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .filtros .grupo {
+                min-width: 150px;
+                flex: 1;
+            }
+            
+            .filtros .series-checkboxes {
+                max-width: 100%;
+            }
+            
+            .filtros button {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+            
+            .exportar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .exportar span {
+                width: 100%;
+            }
+            
+            .exportar button {
+                width: 100%;
+            }
+            
+            .container-tabela {
+                max-height: 400px;
+                font-size: 0.8em;
+            }
+            
+            table {
+                font-size: 0.8em;
+            }
+            
+            th, td {
+                padding: 4px;
+            }
+            
+            .autores-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
+            }
+            
+            .autor-foto {
+                width: 100px;
+                height: 100px;
+                border-width: 2px;
+            }
+            
+            .autor-nome {
+                font-size: 1em;
+            }
+            
+            .autor-cargo {
+                font-size: 0.8em;
+            }
+            
             .radar-container {
                 width: 60px;
                 height: 60px;
                 bottom: 8px;
                 right: 8px;
             }
+            
             .radar-label {
                 display: none;
             }
+            
             #matrix-canvas {
                 opacity: 0.25;
             }
-            .filtros .series-checkboxes {
+            
+            .snake-container {
+                width: 90vw;
                 max-width: 100%;
+                padding: 15px;
+            }
+            
+            #snakeCanvas {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.1em;
+            }
+            
+            .filtros {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .filtros .grupo {
+                width: 100%;
+                min-width: unset;
+            }
+            
+            .filtros button {
+                width: 100%;
+            }
+            
+            .autores-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .autores-section {
+                padding: 15px;
+            }
+            
+            .snake-container {
+                width: 95vw;
+                padding: 10px;
             }
         }
     </style>
@@ -287,7 +636,7 @@
 <body>
     <canvas id="matrix-canvas"></canvas>
 
-    <h1> Séries Macroeconômicas Trimestrais </h1>
+    <h1 class="clickable"> Séries Macroeconômicas Trimestrais </h1>
     <div id="atualizacao">Carregando data de atualização...</div>
 
     <div class="filtros">
@@ -303,7 +652,7 @@
             <label>Data final:</label>
             <input type="date" id="endDate">
         </div>
-        <div class="grupo" style="flex-direction: row; gap: 10px;">
+        <div class="grupo" style="flex-direction: row; gap: 10px; flex-wrap: wrap;">
             <button id="aplicarFiltro">Aplicar filtro</button>
             <button id="todasDatas" class="secundario">Todas as datas</button>
         </div>
@@ -321,13 +670,84 @@
         </table>
     </div>
 
-    <!-- Radar fixo no canto inferior direito -->
-    <div class="radar-container">
+    <!-- Seção de Autores -->
+    <div class="autores-section">
+        <h2>Equipe de Desenvolvimento</h2>
+        <div class="autores-grid">
+            <div class="autor-card">
+                <div class="autor-foto placeholder">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                        <span style="font-size: 2em;">📷</span>
+                    </div>
+                </div>
+                <div class="autor-nome">Christiano Penna</div>
+                <div class="autor-cargo">Orientador</div>
+            </div>
+            <div class="autor-card">
+                <div class="autor-foto placeholder">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                        <span style="font-size: 2em;">📷</span>
+                    </div>
+                </div>
+                <div class="autor-nome">João Leonardo</div>
+                <div class="autor-cargo">Desenvolvedor</div>
+            </div>
+            <div class="autor-card">
+                <div class="autor-foto placeholder">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                        <span style="font-size: 2em;">📷</span>
+                    </div>
+                </div>
+                <div class="autor-nome">Paulo Ícaro</div>
+                <div class="autor-cargo">Economista</div>
+            </div>
+            <div class="autor-card">
+                <div class="autor-foto placeholder">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                        <span style="font-size: 2em;">📷</span>
+                    </div>
+                </div>
+                <div class="autor-nome">Diego Lima</div>
+                <div class="autor-cargo">Economista</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Radar fixo no canto inferior direito (clicável para abrir o jogo) -->
+    <div class="radar-container" id="radarContainer">
         <div class="radar">
             <div class="ponto"></div>
-            <div class="radar-label">SCANING</div>
-            <div class="radar-label"> DATA </div>
-            <div class="radar-label">(100%) </div>
+            <div class="radar-label">SCAN</div>
+            <div class="radar-label">GAME</div>
+            <div class="radar-label">(100%)</div>
+        </div>
+    </div>
+
+    <!-- Modal do Jogo da Cobrinha -->
+    <div id="snakeModal">
+        <div class="snake-container">
+            <div class="snake-header">
+                <h2>🐍 SNAKE MONEY 🐍</h2>
+                <button class="snake-close" id="snakeClose">&times;</button>
+            </div>
+            <canvas id="snakeCanvas" width="400" height="400"></canvas>
+            <div class="snake-info">
+                <div>
+                    <div class="snake-info-label">SCORE</div>
+                    <div class="snake-info-value" id="snakeScore">0</div>
+                </div>
+                <div>
+                    <div class="snake-info-label">LEVEL</div>
+                    <div class="snake-info-value" id="snakeLevel">1</div>
+                </div>
+                <div>
+                    <div class="snake-info-label">MONEY $</div>
+                    <div class="snake-info-value" id="snakeMoney">$0</div>
+                </div>
+            </div>
+            <div class="snake-controls">
+                <p>Use as setas do teclado ou WASD para mover | Clique para recomeçar</p>
+            </div>
         </div>
     </div>
 
