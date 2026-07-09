@@ -1,6 +1,7 @@
 // ===== MATRIX RAIN =====
 (function matrixRain() {
     const canvas = document.getElementById('matrix-canvas');
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
     let width, height, columns, drops, characters;
@@ -39,13 +40,14 @@
     window.addEventListener('resize', resizeCanvas);
     setInterval(draw, 33);
 
+    // Pequeno efeito: ao clicar, aumenta opacidade temporariamente
     document.addEventListener('click', () => {
-        canvas.style.opacity = '0.4';
-        setTimeout(() => canvas.style.opacity = '0.3', 300);
+        canvas.style.opacity = '0.6';
+        setTimeout(() => canvas.style.opacity = '0.4', 300);
     });
 })();
 
-// ===== LÓGICA EXISTENTE DO SITE =====
+// ===== LÓGICA DO SITE (igual à anterior) =====
 document.addEventListener('DOMContentLoaded', function() {
     let dadosCompletos = null;
     let todasColunas = [];
@@ -136,7 +138,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function exportarExcel() {
         if (!dadosCompletos) return;
-
         const colunas = Array.from(tabelaHead.rows[0].cells).map(cell => cell.textContent);
         const linhas = tabelaBody.rows;
 
