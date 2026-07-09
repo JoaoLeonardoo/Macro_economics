@@ -1,3 +1,51 @@
+// ===== MATRIX RAIN =====
+(function matrixRain() {
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height, columns, drops, characters;
+
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        columns = Math.floor(width / 20);
+        drops = new Array(columns).fill(1);
+        characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$¥€£₿#@%&*()_+{}:;<>?!'.split('');
+    }
+
+    function draw() {
+        ctx.fillStyle = 'rgba(18, 18, 18, 0.05)';
+        ctx.fillRect(0, 0, width, height);
+        ctx.font = '18px monospace';
+        ctx.textAlign = 'center';
+
+        for (let i = 0; i < drops.length; i++) {
+            const char = characters[Math.floor(Math.random() * characters.length)];
+            const brightness = Math.floor(100 + Math.random() * 155);
+            ctx.fillStyle = `rgb(0, ${brightness}, 0)`;
+            const x = i * 20;
+            const y = drops[i] * 20;
+            ctx.fillText(char, x, y);
+            if (y > height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    setInterval(draw, 33);
+
+    document.addEventListener('click', () => {
+        canvas.style.opacity = '0.4';
+        setTimeout(() => canvas.style.opacity = '0.3', 300);
+    });
+})();
+
+// ===== LÓGICA EXISTENTE DO SITE =====
 document.addEventListener('DOMContentLoaded', function() {
     let dadosCompletos = null;
     let todasColunas = [];
